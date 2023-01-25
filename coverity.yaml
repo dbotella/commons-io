@@ -1,0 +1,10 @@
+analyze:
+  location: local
+capture:
+  build:
+    build-command: 'mvn package -Drat.skip=true -DskipTests=true'
+    clean-command: 'mvn clean'
+commit:
+  connect:
+    stream: commons-io
+    url: http://localhost:8080
