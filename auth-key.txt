@@ -1,1 +1,16 @@
-{"key":"C368E4277E43DBEDAD5A476208645ED8","id":10066,"type":"Coverity authentication key","username":"committer","comments":{"port":"80","host":"coverity.example","description":"a","creationDate":"2024-03-11T09:07:55.536Z","ssl":"false","expirationDate":"2054-03-11T09:07:55.536Z"},"domain":"local","version":2}
+{
+  "key": "3C74D0EE2EA9B8690FDED769F93F9475",
+  "id": 10065,
+  "type": "Coverity authentication key",
+  "username": "admin",
+  "domain": "local",
+  "version": 2,
+  "comments": {
+    "port": "80",
+    "host": "k8s-cnc-ingressc-61c9622481-902802279.eu-west-1.elb.amazonaws.com",
+    "description": "Generated with coverity setup",
+    "ssl": false,
+    "creationDate": "2024-02-19T09:21:06.100Z",
+    "expirationDate": "2054-02-19T09:21:05Z"
+  }
+}
