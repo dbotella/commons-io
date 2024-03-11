@@ -1,0 +1,1 @@
+{"key":"C368E4277E43DBEDAD5A476208645ED8","id":10066,"type":"Coverity authentication key","username":"committer","comments":{"port":"80","host":"coverity.example","description":"a","creationDate":"2024-03-11T09:07:55.536Z","ssl":"false","expirationDate":"2054-03-11T09:07:55.536Z"},"domain":"local","version":2}
