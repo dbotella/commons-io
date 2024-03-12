@@ -57,7 +57,7 @@ steps:
     inputs:
       options: "-Drat.skip=true -DskipTests=true package"
 
-  - task: SynopsysSecurityScan@1.3.2
+  - task: SynopsysSecurityScan@1.5.0
     displayName: "Coverity Full Scan"
     condition: not(eq(variables['Build.Reason'], 'PullRequest'))
     inputs:
@@ -73,7 +73,7 @@ steps:
       ### Uncomment below configuration if Synopsys Bridge diagnostic files needs to be uploaded
       # include_diagnostics: true
 
-  - task: SynopsysSecurityScan@1.3.2
+  - task: SynopsysSecurityScan@1.5.0
     displayName: "Coverity PR Scan"
     condition: eq(variables['Build.Reason'], 'PullRequest')
     inputs:
