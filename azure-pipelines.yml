@@ -58,8 +58,14 @@ jobs:
           COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
         displayName: Diagnostics
 
+      - script: |
+          sudo pip3 install --upgrade pip
+          pip3 install awscli --upgrade --user
+          export PATH="/home/vsts/.local/bin:$PATH"
+          aws --version
+        displayName: AWS-cli
 
       - task: synopsys-coverity@1
         inputs:
-          coverityBuildDirectory: '$(Build.Repository.LocalPath)'
-          buildCommand: 
+          coverityBuildDirectory: "$(Build.Repository.LocalPath)"
+          buildCommand:
