@@ -83,6 +83,11 @@ jobs:
 
           echo "aws s3 cp s3://cncdemo-uploads-bucket/license.gzip"
           aws s3 cp s3://cncdemo-uploads-bucket/license.gzip license.gzip
+          aws s3 cp s3://cncdemo-uploads-bucket/cov-analysis-linux64-2023.12.0.tar.gz cov-analysis-linux64-2023.12.0.tar.gz 
+
+          tar xfvz cov-analysis-linux64-2023.12.0.tar.gz
+          gunzip license.gzip 
+          cp -fv license.dat cov-analysis-linux64-2023.12.0/bin
 
         displayName: AWS-cli
 
@@ -90,3 +95,4 @@ jobs:
         inputs:
           coverityBuildDirectory: "$(Build.Repository.LocalPath)"
           buildCommand:
+          COVERITY_TOOL_HOME: "./cov-analysis-linux64-2023.12.0"
