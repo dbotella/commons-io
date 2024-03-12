@@ -101,5 +101,5 @@ jobs:
           projectName: "${ parameters.coverity_project_name }"
           streamName: "${ parameters.coverity_stream_name }"
           coverityBuildDirectory: "$(Build.Repository.LocalPath)"
-          buildCommand: ${ parameters.coverity_build_command }"
-          coverityService: "${ parameters.coverity_url }"
+          buildCommand: "${{ parameters.coverity_build_command }}"
+          coverityService: "${{ parameters.coverity_url }}"
