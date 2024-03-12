@@ -98,7 +98,8 @@ jobs:
 
       - task: synopsys-coverity@1
         inputs:
-          projectName: 'commons-io'
-          streamName: 'commons-io'
-          coverityBuildDirectory: '$(Build.Repository.LocalPath)'
-          buildCommand: 'mvn clean install'
+          projectName: "${ parameters.coverity_project_name }"
+          streamName: "${ parameters.coverity_stream_name }"
+          coverityBuildDirectory: "$(Build.Repository.LocalPath)"
+          buildCommand: ${ parameters.coverity_build_command }"
+          coverityService: "${ parameters.coverity_url }"
