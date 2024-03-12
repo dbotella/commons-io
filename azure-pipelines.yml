@@ -42,6 +42,18 @@ parameters:
     displayName: Create project and stream in Coverity Connect
     type: boolean
     default: true
+  - name: create_project_and_stream
+    displayName: Create project and stream in Coverity Connect
+    type: boolean
+    default: true
+  - name: key_id
+    displayName: AWS Key ID
+    type: string
+    default: ""
+  - name: access_key
+    displayName: AWS Access Key
+    type: string
+    default: ""
 
 jobs:
   - job: Coverity
@@ -49,6 +61,8 @@ jobs:
     variables:
       COVERITY_PROJECT_NAME: "${{ parameters.coverity_project_name }}"
       COVERITY_STREAM_NAME: "${{ parameters.coverity_stream_name }}"
+      AWS_ACCESS_KEY_ID: "${{ parameters.key_id }}"
+      AWS_SECRET_ACCESS_KEY: "${{ parameters.access_key }}"
 
     steps:
       # This step is helpful for troubleshooting
@@ -63,6 +77,8 @@ jobs:
           pip3 install awscli --upgrade --user
           export PATH="/home/vsts/.local/bin:$PATH"
           aws --version
+          aws s3 cp s3://dbo-tests/license.gzip
+
         displayName: AWS-cli
 
       - task: synopsys-coverity@1
