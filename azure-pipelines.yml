@@ -57,28 +57,30 @@ steps:
     inputs:
       options: "-Drat.skip=true -DskipTests=true package"
 
-  - task: SynopsysSecurityScan@1
+  - task: SynopsysSecurityScan@1.3.2
     displayName: "Coverity Full Scan"
     condition: not(eq(variables['Build.Reason'], 'PullRequest'))
     inputs:
-      scanType: coverity
-      bridge_coverity_connect_url: "$(COVERITY_URL)"
-      # bridge_coverity_connect_user_name: "$(COV_USER)"
-      # bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
-      bridge_coverity_connect_project_name: "commons-io"
-      bridge_coverity_connect_stream_name: "commons-io-azure"
-      bridge_coverity_connect_policy_view: "Outstanding Issues"
-      bridge_coverity_local: true
-      bridge_coverity_install_directory: /tmp/cov-analysis-linux64-2023.12.0
+      SCANTYPE: coverity
+      BRIDGE_COVERITY_CONNECT_URL: $(COVERITY_URL)
+      BRIDGE_COVERITY_CONNECT_USER_NAME: $(COVERITY_USER)
+      BRIDGE_COVERITY_CONNECT_USER_PASSWORD: $(COVERITY_PASSPHRASE)
+      BRIDGE_COVERITY_CONNECT_PROJECT_NAME: "commons-io"
+      BRIDGE_COVERITY_CONNECT_STREAM_NAME: "commons-io"
+      BRIDGE_COVERITY_CONNECT_POLICY_VIEW: "Outstanding Issues"
+      BRIDGE_COVERITY_LOCAL: true
+      BRIDGE_COVERITY_INSTALL_DIRECTORY: /tmp/cov-analysis-linux64-2023.12.0
+      ### Uncomment below configuration if Synopsys Bridge diagnostic files needs to be uploaded
+      # include_diagnostics: true
 
-  - task: SynopsysSecurityScan@1
+  - task: SynopsysSecurityScan@1.3.2
     displayName: "Coverity PR Scan"
     condition: eq(variables['Build.Reason'], 'PullRequest')
     inputs:
       scanType: coverity
-      bridge_coverity_connect_url: "$(COVERITY_URL)"
-      # bridge_coverity_connect_user_name: "$(COV_USER)"
-      # bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
+      BRIDGE_COVERITY_CONNECT_URL: "$(COVERITY_URL)"
+      bridge_coverity_connect_user_name: "$(COVERITY_USER)"
+      bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
       bridge_coverity_connect_project_name: "commons-io"
       bridge_coverity_connect_stream_name: "commons-io-azure"
       bridge_coverity_automation_prComment: true
