@@ -42,10 +42,6 @@ parameters:
     displayName: Create project and stream in Coverity Connect
     type: boolean
     default: true
-  - name: create_project_and_stream
-    displayName: Create project and stream in Coverity Connect
-    type: boolean
-    default: true
   - name: key_id
     displayName: AWS Key ID
     type: string
