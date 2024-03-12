@@ -14,11 +14,11 @@ parameters:
   - name: coverity_checkers
     displayName: Coverity Checker Options
     type: string
-    default: "-all"
+    default: "--all --webapp-security --webapp-security-aggressiveness-level high --enable-audit-mode"
   - name: coverity_build_command
     displayName: Coverity Build Command
     type: string
-    default: "mvn clean install"
+    default: "mvn -Drat.skip=true -DskipTests=true package"
   - name: coverity_project_name
     displayName: Coverity Project Name
     type: string
@@ -64,6 +64,10 @@ jobs:
       COV_USER: "${{ parameters.coverity_username }}"
       COVERITY_PASSPHRASE: "${{ parameters.coverity_passphrase }}"
 
+    ENDPOINT_URL_COVERITYSERVICE: "${{ parameters.coverity_url }}"
+    ENDPOINT_AUTH_PARAMETER_COVERITYSERVICE_USERNAME: "${{ parameters.coverity_username }}"
+    ENDPOINT_AUTH_PARAMETER_COVERITYSERVICE_PASSWORD: "${{ parameters.coverity_passphrase }}"
+
     steps:
       # This step is helpful for troubleshooting
       - bash: env
@@ -102,4 +106,3 @@ jobs:
           streamName: "${ parameters.coverity_stream_name }"
           coverityBuildDirectory: "$(Build.Repository.LocalPath)"
           buildCommand: "${{ parameters.coverity_build_command }}"
-          coverityService: "${{ parameters.coverity_url }}"
