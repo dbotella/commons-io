@@ -1,109 +1,69 @@
-parameters:
-  - name: coverity_url
-    displayName: Coverity URL
-    type: string
-    default: "http://k8s-cnc-ingressc-61c9622481-902802279.eu-west-1.elb.amazonaws.com"
-  - name: coverity_username
-    displayName: Coverity Username
-    type: string
-    default: "committer"
-  - name: coverity_passphrase
-    displayName: Coverity Passphrase
-    type: string
-    default: ""
-  - name: coverity_checkers
-    displayName: Coverity Checker Options
-    type: string
-    default: "--all --webapp-security --webapp-security-aggressiveness-level high --enable-audit-mode"
-  - name: coverity_build_command
-    displayName: Coverity Build Command
-    type: string
-    default: "mvn -Drat.skip=true -DskipTests=true package"
-  - name: coverity_project_name
-    displayName: Coverity Project Name
-    type: string
-    default: "commons-io"
-  - name: coverity_stream_name
-    displayName: Coverity Stream Name
-    type: string
-    default: "commons-io"
-  - name: main_branches
-    displayName: Main branches to run Coverity on
-    type: object
-    default:
-      - refs/heads/main
-      - refs/heads/master
-      - refs/heads/test
-  - name: security_gate_view_name
-    displayName: Coverity Saved View for Security Gate
-    type: string
-    default: "Outstanding Issues"
-  - name: create_project_and_stream
-    displayName: Create project and stream in Coverity Connect
-    type: boolean
-    default: false
-  - name: key_id
-    displayName: AWS Key ID
-    type: string
-    default: ""
-  - name: access_key
-    displayName: AWS Access Key
-    type: string
-    default: ""
+# example pipeline for Coverity scans using the Synopsys Security Scan extension for ADO
+# https://marketplace.visualstudio.com/items?itemName=synopsys-security-scan.synopsys-security-scan
+trigger:
+  - main
 
-jobs:
-  - job: Coverity
+pool:
+  vmImage: ubuntu-latest
 
-    variables:
-      COVERITY_PROJECT_NAME: "${{ parameters.coverity_project_name }}"
-      COVERITY_STREAM_NAME: "${{ parameters.coverity_stream_name }}"
-      AWS_ACCESS_KEY_ID: "${{ parameters.key_id }}"
-      AWS_SECRET_ACCESS_KEY: "${{ parameters.access_key }}"
-      COVERITY_TOOL_HOME: "/tmp/cov-analysis-linux64-2023.12.0"
-      COV_URL: "${{ parameters.coverity_url }}"
-      COV_USER: "${{ parameters.coverity_username }}"
-      COVERITY_PASSPHRASE: "${{ parameters.coverity_passphrase }}"
-      ENDPOINT_URL_COVERITYSERVICE: "${{ parameters.coverity_url }}"
-      ENDPOINT_AUTH_PARAMETER_COVERITYSERVICE_USERNAME: "${{ parameters.coverity_username }}"
-      ENDPOINT_AUTH_PARAMETER_COVERITYSERVICE_PASSWORD: "${{ parameters.coverity_passphrase }}"
+variables:
+  - group: CNC-EKS
 
-    steps:
-      # This step is helpful for troubleshooting
-      - bash: env
-        env:
-          COV_USER: $(COV_USER)
-          COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
-        displayName: Diagnostics
+steps:
+  - task: JavaToolInstaller@0
+    displayName: "Use Java 17"
+    inputs:
+      versionSpec: 17
+      jdkArchitectureOption: x64
+      jdkSourceOption: PreInstalled
 
-      - script: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install --update
-          which aws
-          aws --version
-          export AWS_ACCESS_KEY_ID="${{ parameters.key_id }}"
-          export AWS_SECRET_ACCESS_KEY="${{ parameters.access_key }}"
-          export AWS_DEFAULT_REGION="eu-west-1"
-          echo $AWS_ACCESS_KEY_ID
-          echo $AWS_SECRET_ACCESS_KEY
-          echo $AWS_DEFAULT_REGION
+  - task: Maven@4
+    displayName: "Maven Build"
+    inputs:
+      options: "-B -DskipTests"
 
-          echo "aws s3 cp s3://cncdemo-uploads-bucket/license.dat"
-          aws s3 cp s3://cncdemo-uploads-bucket/license.dat license.dat
-          aws s3 cp s3://cncdemo-uploads-bucket/cov-analysis-linux64-2023.12.0.tar.gz cov-analysis-linux64-2023.12.0.tar.gz 
+  - task: SynopsysSecurityScan@1
+    displayName: "Coverity Full Scan"
+    condition: not(eq(variables['Build.Reason'], 'PullRequest'))
+    inputs:
+      scanType: coverity
+      bridge_coverity_connect_url: "$(COVERITY_URL)"
+      bridge_coverity_connect_user_name: "$(COV_USER)"
+      bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
+      bridge_coverity_connect_project_name: "$(Build.Repository.Name)"
+      bridge_coverity_connect_stream_name: "$(Build.Repository.Name)-$(Build.SourceBranchName)"
+      bridge_coverity_connect_policy_view: "Outstanding Issues"
+      # bridge_coverity_local: true
+      # bridge_coverity_install_directory: $(Agent.TempDirectory)/coverity
 
-          tar xfvz cov-analysis-linux64-2023.12.0.tar.gz
-          rm cov-analysis-linux64-2023.12.0.tar.gz
-          mv cov-analysis-linux64-2023.12.0 /tmp
-          cp -fv license.dat /tmp/cov-analysis-linux64-2023.12.0/bin
+  - task: SynopsysSecurityScan@1
+    displayName: "Coverity PR Scan"
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    inputs:
+      scanType: coverity
+      bridge_coverity_connect_url: "$(COVERITY_URL)"
+      bridge_coverity_connect_user_name: "$(COV_USER)"
+      bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
+      bridge_coverity_connect_project_name: "$(Build.Repository.Name)"
+      bridge_coverity_connect_stream_name: "$(Build.Repository.Name)-$(System.PullRequest.targetBranchName)"
+      bridge_coverity_automation_prComment: true
+      azure_token: $(System.AccessToken)
+      # bridge_coverity_local: true
+      # bridge_coverity_install_directory: $(Agent.TempDirectory)/coverity
 
-        displayName: AWS-cli
+  - task: ArchiveFiles@2
+    displayName: "Copy Log Files"
+    condition: succeededOrFailed()
+    enabled: false
+    inputs:
+      rootFolderOrFile: .bridge
+      includeRootFolder: false
+      archiveFile: "$(Build.ArtifactStagingDirectory)/bridge-logs.zip"
 
-      - task: synopsys-coverity@1
-        displayName: 'Coverity Scan'
-        inputs:
-          projectName: "${ parameters.coverity_project_name }"
-          streamName: "${ parameters.coverity_stream_name }"
-          coverityBuildDirectory: "$(Build.Repository.LocalPath)"
-          buildCommand: "${{ parameters.coverity_build_command }}"
-          coverityService: 'CNC-EKS'
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish Log Files"
+    condition: succeededOrFailed()
+    enabled: false
+    inputs:
+      PathtoPublish: "$(Build.ArtifactStagingDirectory)"
+      ArtifactName: "logs"
