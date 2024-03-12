@@ -63,8 +63,8 @@ steps:
     inputs:
       scanType: coverity
       bridge_coverity_connect_url: "$(COVERITY_URL)"
-      bridge_coverity_connect_user_name: "$(COV_USER)"
-      bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
+      # bridge_coverity_connect_user_name: "$(COV_USER)"
+      # bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
       bridge_coverity_connect_project_name: "commons-io"
       bridge_coverity_connect_stream_name: "commons-io-azure"
       bridge_coverity_connect_policy_view: "Outstanding Issues"
@@ -77,8 +77,8 @@ steps:
     inputs:
       scanType: coverity
       bridge_coverity_connect_url: "$(COVERITY_URL)"
-      bridge_coverity_connect_user_name: "$(COV_USER)"
-      bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
+      # bridge_coverity_connect_user_name: "$(COV_USER)"
+      # bridge_coverity_connect_user_password: "$(COVERITY_PASSPHRASE)"
       bridge_coverity_connect_project_name: "commons-io"
       bridge_coverity_connect_stream_name: "commons-io-azure"
       bridge_coverity_automation_prComment: true
