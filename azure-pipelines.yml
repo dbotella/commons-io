@@ -10,23 +10,23 @@ parameters:
   - name: coverity_passphrase
     displayName: Coverity Passphrase
     type: string
-    default: "hykfis-jaxvoS-funfo2"
+    default: ""
   - name: coverity_checkers
     displayName: Coverity Checker Options
     type: string
-    default: ""
+    default: "-all"
   - name: coverity_build_command
     displayName: Coverity Build Command
     type: string
-    default: ""
+    default: "mvn clean install"
   - name: coverity_project_name
     displayName: Coverity Project Name
     type: string
-    default: ""
+    default: "commons-io"
   - name: coverity_stream_name
     displayName: Coverity Stream Name
     type: string
-    default: ""
+    default: "commons-io"
   - name: main_branches
     displayName: Main branches to run Coverity on
     type: object
@@ -37,7 +37,7 @@ parameters:
   - name: security_gate_view_name
     displayName: Coverity Saved View for Security Gate
     type: string
-    default: ""
+    default: "Outstanding Issues"
   - name: create_project_and_stream
     displayName: Create project and stream in Coverity Connect
     type: boolean
@@ -58,34 +58,6 @@ jobs:
           COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
         displayName: Diagnostics
 
-      # Create project and stream if they don't exist
-      - bash: |
-          export COVERITY_STREAM_NAME=${BUILD_REPOSITORY_NAME}-${BUILD_SOURCEBRANCHNAME}
-          echo Ensure that stream "$COVERITY_STREAM_NAME" exists
-          echo cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode projects --add --set name:"$COVERITY_STREAM_NAME" || true
-          cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode projects --add --set name:"$COVERITY_STREAM_NAME" || true
-          echo cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode streams --add -set name:"$COVERITY_STREAM_NAME" || true
-          cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode streams --add -set name:"$COVERITY_STREAM_NAME" || true
-          echo cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode projects --update --name "$COVERITY_STREAM_NAME" --insert stream:"$COVERITY_STREAM_NAME" || true
-          cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode projects --update --name "$COVERITY_STREAM_NAME" --insert stream:"$COVERITY_STREAM_NAME" || true
-        displayName: Create project and stream
-        # Run full analysis only on builds of master, not on pull requests
-        condition: eq(variables['Build.SourceBranchName'], 'master')
-        env:
-          COV_USER: $(COV_USER)
-          COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
-
-      # Commit full analysis
-      - bash: |
-          export COVERITY_STREAM_NAME=${BUILD_REPOSITORY_NAME}-${BUILD_SOURCEBRANCHNAME}
-          coverity scan --dir coverity-data/idir 
-          cov-format-errors  --dir coverity-data/idir --json-output-v8 coverity-output-v8.json
-        displayName: Commit full analysis results
-        # Run full analysis only on builds of master, not on pull requests
-        condition: eq(variables['Build.SourceBranchName'], 'master')
-        env:
-          COV_USER: $(COV_USER)
-          COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
 
       - task: synopsys-coverity@1
         inputs:
