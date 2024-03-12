@@ -100,8 +100,10 @@ jobs:
         displayName: AWS-cli
 
       - task: synopsys-coverity@1
+        displayName: 'Coverity Scan'
         inputs:
           projectName: "${ parameters.coverity_project_name }"
           streamName: "${ parameters.coverity_stream_name }"
           coverityBuildDirectory: "$(Build.Repository.LocalPath)"
           buildCommand: "${{ parameters.coverity_build_command }}"
+          coverityService: 'CNC-EKS'
