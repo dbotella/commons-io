@@ -76,8 +76,8 @@ jobs:
           aws --version
           export AWS_ACCESS_KEY_ID="${{ parameters.key_id }}"
           export AWS_ACCESS_KEY_ID="${{ parameters.access_key }}"
-          echo "aws s3 cp s3://dbo-tests/license.gzip"
-          aws s3 cp s3://dbo-tests/license.gzip license.gzip
+          echo "aws s3 cp s3://cncdemo-uploads-bucket/license.gzip"
+          aws s3 cp s3://cncdemo-uploads-bucket/license.gzip license.gzip
 
         displayName: AWS-cli
 
