@@ -59,6 +59,7 @@ jobs:
       COVERITY_STREAM_NAME: "${{ parameters.coverity_stream_name }}"
       AWS_ACCESS_KEY_ID: "${{ parameters.key_id }}"
       AWS_SECRET_ACCESS_KEY: "${{ parameters.access_key }}"
+      COVERITY_TOOL_HOME: "/tmp/cov-analysis-linux64-2023.12.0"
 
     steps:
       # This step is helpful for troubleshooting
@@ -96,4 +97,3 @@ jobs:
         inputs:
           coverityBuildDirectory: "$(Build.Repository.LocalPath)"
           buildCommand:
-          COVERITY_TOOL_HOME: "/tmp/cov-analysis-linux64-2023.12.0"
