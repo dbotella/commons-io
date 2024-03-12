@@ -63,10 +63,9 @@ jobs:
       COV_URL: "${{ parameters.coverity_url }}"
       COV_USER: "${{ parameters.coverity_username }}"
       COVERITY_PASSPHRASE: "${{ parameters.coverity_passphrase }}"
-
-    ENDPOINT_URL_COVERITYSERVICE: "${{ parameters.coverity_url }}"
-    ENDPOINT_AUTH_PARAMETER_COVERITYSERVICE_USERNAME: "${{ parameters.coverity_username }}"
-    ENDPOINT_AUTH_PARAMETER_COVERITYSERVICE_PASSWORD: "${{ parameters.coverity_passphrase }}"
+      ENDPOINT_URL_COVERITYSERVICE: "${{ parameters.coverity_url }}"
+      ENDPOINT_AUTH_PARAMETER_COVERITYSERVICE_USERNAME: "${{ parameters.coverity_username }}"
+      ENDPOINT_AUTH_PARAMETER_COVERITYSERVICE_PASSWORD: "${{ parameters.coverity_passphrase }}"
 
     steps:
       # This step is helpful for troubleshooting
