@@ -81,13 +81,14 @@ jobs:
           echo $AWS_SECRET_ACCESS_KEY
           echo $AWS_DEFAULT_REGION
 
-          echo "aws s3 cp s3://cncdemo-uploads-bucket/license.gzip"
-          aws s3 cp s3://cncdemo-uploads-bucket/license.gzip license.gzip
+          echo "aws s3 cp s3://cncdemo-uploads-bucket/license.dat"
+          aws s3 cp s3://cncdemo-uploads-bucket/license.dat license.dat
           aws s3 cp s3://cncdemo-uploads-bucket/cov-analysis-linux64-2023.12.0.tar.gz cov-analysis-linux64-2023.12.0.tar.gz 
 
           tar xfvz cov-analysis-linux64-2023.12.0.tar.gz
-          gunzip license.gzip 
-          cp -fv license.dat cov-analysis-linux64-2023.12.0/bin
+          rm cov-analysis-linux64-2023.12.0.tar.gz
+          mv cov-analysis-linux64-2023.12.0 /tmp
+          cp -fv license.dat /tmp/cov-analysis-linux64-2023.12.0/bin
 
         displayName: AWS-cli
 
@@ -95,4 +96,4 @@ jobs:
         inputs:
           coverityBuildDirectory: "$(Build.Repository.LocalPath)"
           buildCommand:
-          COVERITY_TOOL_HOME: "./cov-analysis-linux64-2023.12.0"
+          COVERITY_TOOL_HOME: "/tmp/cov-analysis-linux64-2023.12.0"
