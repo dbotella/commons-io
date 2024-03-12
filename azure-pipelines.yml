@@ -1,25 +1,44 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+parameters:
+  coverity_url: "http://k8s-cnc-ingressc-61c9622481-902802279.eu-west-1.elb.amazonaws.com "
+  coverity_username: "committer"
+  coverity_passphrase: "hykfis-jaxvoS-funfo2"
 
-trigger:
-- master
+jobs:
+  - job: Coverity
 
-pool:
-  vmImage: ubuntu-latest
+    steps:
+      # This step is helpful for troubleshooting
+      - bash: env
+        env:
+          COV_USER: $(COV_USER)
+          COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
+        displayName: Diagnostics
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+      # Create project and stream if they don't exist
+      - bash: |
+          export COVERITY_STREAM_NAME=${BUILD_REPOSITORY_NAME}-${BUILD_SOURCEBRANCHNAME}
+          echo Ensure that stream "$COVERITY_STREAM_NAME" exists
+          echo cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode projects --add --set name:"$COVERITY_STREAM_NAME" || true
+          cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode projects --add --set name:"$COVERITY_STREAM_NAME" || true
+          echo cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode streams --add -set name:"$COVERITY_STREAM_NAME" || true
+          cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode streams --add -set name:"$COVERITY_STREAM_NAME" || true
+          echo cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode projects --update --name "$COVERITY_STREAM_NAME" --insert stream:"$COVERITY_STREAM_NAME" || true
+          cov-manage-im --url $COVERITY_URL --on-new-cert trust --mode projects --update --name "$COVERITY_STREAM_NAME" --insert stream:"$COVERITY_STREAM_NAME" || true
+        displayName: Create project and stream
+        # Run full analysis only on builds of master, not on pull requests
+        condition: eq(variables['Build.SourceBranchName'], 'master')
+        env:
+          COV_USER: $(COV_USER)
+          COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
-
-- task: synopsys-coverity@1
-  inputs:
-    projectName: 'commons-io'
-    streamName: 'commons-io'
-    coverityBuildDirectory: '$(Build.Repository.LocalPath)'
+      # Commit full analysis
+      - bash: |
+          export COVERITY_STREAM_NAME=${BUILD_REPOSITORY_NAME}-${BUILD_SOURCEBRANCHNAME}
+          coverity scan --dir coverity-data/idir 
+          cov-format-errors  --dir coverity-data/idir --json-output-v8 coverity-output-v8.json
+        displayName: Commit full analysis results
+        # Run full analysis only on builds of master, not on pull requests
+        condition: eq(variables['Build.SourceBranchName'], 'master')
+        env:
+          COV_USER: $(COV_USER)
+          COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
