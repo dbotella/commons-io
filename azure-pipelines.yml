@@ -86,3 +86,8 @@ jobs:
         env:
           COV_USER: $(COV_USER)
           COVERITY_PASSPHRASE: $(COVERITY_PASSPHRASE)
+
+      - task: synopsys-coverity@1
+        inputs:
+          coverityBuildDirectory: '$(Build.Repository.LocalPath)'
+          buildCommand: 
