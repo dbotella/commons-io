@@ -71,13 +71,13 @@ jobs:
       - script: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
-          sudo ./aws/install
+          sudo ./aws/install --update
           which aws
           aws --version
           export AWS_ACCESS_KEY_ID="${{ parameters.key_id }}"
           export AWS_ACCESS_KEY_ID="${{ parameters.access_key }}"
           echo "aws s3 cp s3://dbo-tests/license.gzip"
-          aws s3 cp s3://dbo-tests/license.gzip
+          aws s3 cp s3://dbo-tests/license.gzip license.gzip
 
         displayName: AWS-cli
 
