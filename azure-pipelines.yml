@@ -1,10 +1,54 @@
 parameters:
-  coverity_url: "http://k8s-cnc-ingressc-61c9622481-902802279.eu-west-1.elb.amazonaws.com "
-  coverity_username: "committer"
-  coverity_passphrase: "hykfis-jaxvoS-funfo2"
+  - name: coverity_url
+    displayName: Coverity URL
+    type: string
+    default: "http://k8s-cnc-ingressc-61c9622481-902802279.eu-west-1.elb.amazonaws.com "
+  - name: coverity_username
+    displayName: Coverity Username
+    type: string
+    default: "committer"
+  - name: coverity_passphrase
+    displayName: Coverity Passphrase
+    type: string
+    default: "hykfis-jaxvoS-funfo2"
+  - name: coverity_checkers
+    displayName: Coverity Checker Options
+    type: string
+    default: ""
+  - name: coverity_build_command
+    displayName: Coverity Build Command
+    type: string
+    default: ""
+  - name: coverity_project_name
+    displayName: Coverity Project Name
+    type: string
+    default: ""
+  - name: coverity_stream_name
+    displayName: Coverity Stream Name
+    type: string
+    default: ""
+  - name: main_branches
+    displayName: Main branches to run Coverity on
+    type: object
+    default:
+      - refs/heads/main
+      - refs/heads/master
+      - refs/heads/test
+  - name: security_gate_view_name
+    displayName: Coverity Saved View for Security Gate
+    type: string
+    default: ""
+  - name: create_project_and_stream
+    displayName: Create project and stream in Coverity Connect
+    type: boolean
+    default: true
 
 jobs:
   - job: Coverity
+
+    variables:
+      COVERITY_PROJECT_NAME: "${{ parameters.coverity_project_name }}"
+      COVERITY_STREAM_NAME: "${{ parameters.coverity_stream_name }}"
 
     steps:
       # This step is helpful for troubleshooting
